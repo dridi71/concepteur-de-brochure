@@ -13,9 +13,23 @@ export interface Theme {
   imageUrl: string;
 }
 
+export interface TextStroke {
+  color: string;
+  width: number; // in pixels
+}
+
+export interface TextShadow {
+  color: string;
+  blur: number; // in pixels
+  offsetX: number; // in pixels
+  offsetY: number; // in pixels
+}
+
 export interface TextStyle {
   fontSize: number; // in pixels
   color: string;
+  stroke?: TextStroke;
+  shadow?: TextShadow;
 }
 
 export interface TextStyles {

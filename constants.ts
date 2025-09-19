@@ -9,11 +9,36 @@ export const INITIAL_COVER_DATA: CoverData = {
 };
 
 export const INITIAL_TEXT_STYLES: TextStyles = {
-  title: { fontSize: 48, color: '#2563EB' }, // Corresponds to text-blue-700
-  name: { fontSize: 36, color: '#67E8F9' }, // Corresponds to text-cyan-300
-  subject: { fontSize: 24, color: '#F3F4F6' }, // Corresponds to text-gray-100
-  schoolName: { fontSize: 20, color: '#FFFFFF' }, // Corresponds to text-white
-  otherInfo: { fontSize: 24, color: '#FFFFFF' }, // Corresponds to text-white
+  title: { 
+    fontSize: 48, 
+    color: '#2563EB',
+    stroke: { color: '#FFFFFF', width: 1 },
+    shadow: { color: 'rgba(0,0,0,0.3)', blur: 3, offsetX: 2, offsetY: 2 },
+  },
+  name: { 
+    fontSize: 36, 
+    color: '#67E8F9',
+    stroke: { color: '#000000', width: 0 },
+    shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+  },
+  subject: { 
+    fontSize: 24, 
+    color: '#F3F4F6',
+    stroke: { color: '#000000', width: 0 },
+    shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+  },
+  schoolName: { 
+    fontSize: 20, 
+    color: '#FFFFFF',
+    stroke: { color: '#000000', width: 0 },
+    shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+  },
+  otherInfo: { 
+    fontSize: 24, 
+    color: '#FFFFFF',
+    stroke: { color: '#000000', width: 0 },
+    shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+  },
 };
 
 
@@ -29,6 +54,9 @@ export const THEMES: Theme[] = [
   { id: 'history', name: 'تاريخ', imageUrl: 'https://picsum.photos/seed/history123/840/1188' },
   { id: 'stitch', name: 'ستيتش', imageUrl: 'https://picsum.photos/seed/stitch123/840/1188' },
   { id: 'mickey', name: 'ميكي ماوس', imageUrl: 'https://picsum.photos/seed/mickey123/840/1188' },
+  { id: 'space_2', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space456/840/1188' },
+  { id: 'animals_2', name: 'حيوانات', imageUrl: 'https://picsum.photos/seed/animals456/840/1188' },
+  { id: 'school_2', name: 'مدرسة', imageUrl: 'https://picsum.photos/seed/school456/840/1188' },
 ];
 
 export const FONTS: { id: FontFamily; name: string }[] = [

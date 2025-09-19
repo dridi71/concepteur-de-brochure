@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from '../types';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, TextStyle } from '../types';
 
 interface CoverPreviewProps {
   coverData: CoverData;
@@ -22,16 +22,37 @@ const InfoField: React.FC<{ label: string; value: string; style: React.CSSProper
 const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, id = "printable-area", selectedFont, showSubject, layoutOrder, textStyles }) => {
   const fontStyle = { fontFamily: `'${selectedFont}', sans-serif` };
 
+  const getDynamicTextStyle = (style: TextStyle): React.CSSProperties => {
+    const dynamicStyle: React.CSSProperties = {
+      ...fontStyle,
+      fontSize: `${style.fontSize}px`,
+      color: style.color,
+    };
+
+    if (style.stroke && style.stroke.width > 0) {
+      dynamicStyle.WebkitTextStroke = `${style.stroke.width}px ${style.stroke.color}`;
+      // A more standard property, though less supported
+      (dynamicStyle as any).textStroke = `${style.stroke.width}px ${style.stroke.color}`;
+    }
+
+    if (style.shadow && (style.shadow.blur > 0 || style.shadow.offsetX !== 0 || style.shadow.offsetY !== 0)) {
+      dynamicStyle.textShadow = `${style.shadow.offsetX}px ${style.shadow.offsetY}px ${style.shadow.blur}px ${style.shadow.color}`;
+    }
+
+    return dynamicStyle;
+  };
+
+
   const subjectBlock = (
     <div className="relative z-10 text-center bg-black/30 backdrop-blur-sm p-4 rounded-xl">
         <h1 
           className="font-black drop-shadow-lg" 
-          style={{ ...fontStyle, fontSize: `${textStyles.title.fontSize}px`, color: textStyles.title.color, WebkitTextStroke: '1px white' }}
+          style={getDynamicTextStyle(textStyles.title)}
         >
           كراس القسم
         </h1>
         {showSubject && 
-          <p className="font-bold mt-2" style={{ ...fontStyle, fontSize: `${textStyles.subject.fontSize}px`, color: textStyles.subject.color }}>
+          <p className="font-bold mt-2" style={getDynamicTextStyle(textStyles.subject)}>
             {coverData.subject}
           </p>
         }
@@ -44,7 +65,7 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
             <p className="text-xl font-semibold text-gray-200" style={fontStyle}>التلميذ/ة</p>
             <p 
               className="font-extrabold tracking-wide" 
-              style={{ ...fontStyle, fontSize: `${textStyles.name.fontSize}px`, color: textStyles.name.color }}
+              style={getDynamicTextStyle(textStyles.name)}
             >
               {coverData.name}
             </p>
@@ -53,12 +74,12 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
             <InfoField 
               label="القسم" 
               value={coverData.className} 
-              style={{ ...fontStyle, fontSize: `${textStyles.otherInfo.fontSize}px`, color: textStyles.otherInfo.color }} 
+              style={getDynamicTextStyle(textStyles.otherInfo)} 
             />
             <InfoField 
               label="السنة الدراسية" 
               value={coverData.schoolYear} 
-              style={{ ...fontStyle, fontSize: `${textStyles.otherInfo.fontSize}px`, color: textStyles.otherInfo.color }} 
+              style={getDynamicTextStyle(textStyles.otherInfo)} 
             />
         </div>
     </div>
@@ -66,7 +87,7 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
 
   const schoolNameBlock = (
     <div className="relative z-10 text-center bg-black/30 backdrop-blur-sm py-2 px-4 rounded-xl">
-        <p className="font-bold" style={{ ...fontStyle, fontSize: `${textStyles.schoolName.fontSize}px`, color: textStyles.schoolName.color }}>
+        <p className="font-bold" style={getDynamicTextStyle(textStyles.schoolName)}>
           {coverData.schoolName}
         </p>
     </div>
