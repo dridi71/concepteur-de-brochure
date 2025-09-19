@@ -57,25 +57,46 @@ const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, 
   };
 
   const getPreviewStyle = (): React.CSSProperties => {
+    // Determine a character threshold for scaling based on the control's label
+    let threshold = 20; // Generic default
+    if (label.includes("اسم التلميذ")) threshold = 15;
+    if (label.includes("المادة")) threshold = 20;
+    if (label.includes("اسم المدرسة")) threshold = 25;
+    if (label.includes("العنوان")) threshold = 100; // Unlikely to scale
+    if (label.includes("معلومات")) threshold = 100; // Unlikely to scale
+
+    const length = previewText.length;
+    const baseSize = style.fontSize;
+    const minSize = 14;
+
+    let finalSize = baseSize;
+    if (length > threshold) {
+        const scaleFactor = Math.log(threshold) / Math.log(length);
+        finalSize = Math.round(baseSize * scaleFactor);
+    }
+    const adjustedSize = Math.max(minSize, finalSize);
+    
+    const adjustedStyle = { ...style, fontSize: adjustedSize };
+    
     const previewStyle: React.CSSProperties = {
       fontFamily: `'${fontFamily}', sans-serif`,
-      fontSize: `${style.fontSize}px`,
-      color: style.color,
+      fontSize: `${adjustedStyle.fontSize}px`,
+      color: adjustedStyle.color,
     };
   
-    if (style.gradient?.enabled) {
-      previewStyle.background = `linear-gradient(${style.gradient.direction}, ${style.gradient.color1}, ${style.gradient.color2})`;
+    if (adjustedStyle.gradient?.enabled) {
+      previewStyle.background = `linear-gradient(${adjustedStyle.gradient.direction}, ${adjustedStyle.gradient.color1}, ${adjustedStyle.gradient.color2})`;
       previewStyle.WebkitBackgroundClip = 'text';
       previewStyle.backgroundClip = 'text';
       previewStyle.color = 'transparent';
     }
   
-    if (style.stroke && style.stroke.width > 0) {
-      previewStyle.WebkitTextStroke = `${style.stroke.width}px ${style.stroke.color}`;
+    if (adjustedStyle.stroke && adjustedStyle.stroke.width > 0) {
+      previewStyle.WebkitTextStroke = `${adjustedStyle.stroke.width}px ${adjustedStyle.stroke.color}`;
     }
   
-    if (style.shadow && (style.shadow.blur > 0 || style.shadow.offsetX !== 0 || style.shadow.offsetY !== 0)) {
-      previewStyle.textShadow = `${style.shadow.offsetX}px ${style.shadow.offsetY}px ${style.shadow.blur}px ${style.shadow.color}`;
+    if (adjustedStyle.shadow && (adjustedStyle.shadow.blur > 0 || adjustedStyle.shadow.offsetX !== 0 || adjustedStyle.shadow.offsetY !== 0)) {
+      previewStyle.textShadow = `${adjustedStyle.shadow.offsetX}px ${adjustedStyle.shadow.offsetY}px ${adjustedStyle.shadow.blur}px ${adjustedStyle.shadow.color}`;
     }
   
     return previewStyle;

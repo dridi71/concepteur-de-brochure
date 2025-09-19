@@ -6,21 +6,47 @@
     <title>مصمم غلاف كراس</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700;900&family=Lateef:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700;900&family=Katibeh&family=Lalezar&family=Lateef:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Cairo', sans-serif;
       }
       @media print {
+        @page {
+          margin: 0;
+        }
+        
+        html[data-papersize="A4"] @page {
+          size: A4 portrait;
+        }
+
+        html[data-papersize="notebook"] @page {
+          size: 17cm 22cm;
+        }
+
         body * {
           visibility: hidden;
         }
-        #printable-area, #printable-area * {
-          visibility: visible;
+
+        /* When modal is open, only its preview is visible */
+        body.modal-open #printable-area-modal, 
+        body.modal-open #printable-area-modal * {
+            visibility: visible;
         }
-        #printable-area {
+
+        /* When modal is NOT open, only main preview is visible */
+        body:not(.modal-open) #printable-area,
+        body:not(.modal-open) #printable-area * {
+            visibility: visible;
+        }
+
+        /* Common styling for the element being printed */
+        #printable-area, #printable-area-modal {
           position: absolute;
           left: 0;
           top: 0;

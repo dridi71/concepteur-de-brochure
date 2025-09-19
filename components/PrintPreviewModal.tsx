@@ -1,8 +1,10 @@
-import React from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from '../types';
+import React, { useEffect } from 'react';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, PaperSize } from '../types';
 import CoverPreview from './CoverPreview';
 import PrintButton from './PrintButton';
 import DownloadButton from './DownloadButton';
+import ExportPDFButton from './ExportPDFButton';
+import ExportWordButton from './ExportWordButton';
 
 interface PrintPreviewModalProps {
   isOpen: boolean;
@@ -13,14 +15,27 @@ interface PrintPreviewModalProps {
   showSubject: boolean;
   layoutOrder: LayoutOrder;
   textStyles: TextStyles;
+  paperSize: PaperSize;
 }
 
-const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, coverData, selectedTheme, selectedFont, showSubject, layoutOrder, textStyles }) => {
+const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, coverData, selectedTheme, selectedFont, showSubject, layoutOrder, textStyles, paperSize }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!isOpen) {
     return null;
   }
 
   const modalPreviewId = "printable-area-modal";
+  const sizeText = paperSize === 'A4' ? 'A4' : 'كراس عادي';
 
   return (
     <div
@@ -35,7 +50,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, 
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 flex-shrink-0">
-          <h2 id="print-preview-title" className="text-xl sm:text-2xl font-bold text-slate-800">معاينة الطباعة (حجم A4)</h2>
+          <h2 id="print-preview-title" className="text-xl sm:text-2xl font-bold text-slate-800">معاينة الطباعة (حجم {sizeText})</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
@@ -60,14 +75,17 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, 
               showSubject={showSubject}
               layoutOrder={layoutOrder}
               textStyles={textStyles}
+              paperSize={paperSize}
             />
           </div>
         </div>
 
         <div className="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 flex-shrink-0">
-          <p className="text-sm text-slate-500 text-center sm:text-right">هذه معاينة لكيفية ظهور الغلاف على ورقة A4.</p>
-          <div className="flex gap-3">
+          <p className="text-sm text-slate-500 text-center sm:text-right">هذه معاينة لكيفية ظهور الغلاف على ورقة {paperSize === 'A4' ? 'A4' : 'كراس عادي (17x22 سم)'}.</p>
+          <div className="flex flex-wrap justify-center sm:justify-end gap-3">
             <DownloadButton elementIdToCapture={modalPreviewId} />
+            <ExportPDFButton elementIdToCapture={modalPreviewId} paperSize={paperSize} />
+            <ExportWordButton elementIdToCapture={modalPreviewId} paperSize={paperSize} />
             <PrintButton />
           </div>
         </div>

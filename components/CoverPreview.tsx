@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, TextStyle } from '../types';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, TextStyle, PaperSize } from '../types';
 
 interface CoverPreviewProps {
   coverData: CoverData;
@@ -9,6 +9,7 @@ interface CoverPreviewProps {
   showSubject: boolean;
   layoutOrder: LayoutOrder;
   textStyles: TextStyles;
+  paperSize: PaperSize;
 }
 
 const InfoField: React.FC<{ label: string; value: string; style: React.CSSProperties }> = ({ label, value, style }) => (
@@ -19,7 +20,7 @@ const InfoField: React.FC<{ label: string; value: string; style: React.CSSProper
 );
 
 
-const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, id = "printable-area", selectedFont, showSubject, layoutOrder, textStyles }) => {
+const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, id = "printable-area", selectedFont, showSubject, layoutOrder, textStyles, paperSize }) => {
   const fontStyle = { fontFamily: `'${selectedFont}', sans-serif` };
 
   const getDynamicTextStyle = (style: TextStyle): React.CSSProperties => {
@@ -48,6 +49,25 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
 
     return dynamicStyle;
   };
+  
+  const getAdjustedDynamicTextStyle = (text: string, baseStyle: TextStyle, threshold: number): React.CSSProperties => {
+    const length = text.length;
+    const baseSize = baseStyle.fontSize;
+    const minSize = 14; // A readable minimum font size
+
+    let finalSize = baseSize;
+    if (length > threshold) {
+        // Logarithmic scaling: newSize = baseSize * (log(threshold) / log(length))
+        // This creates a smooth curve where the font size drops off and then levels out for very long text.
+        const scaleFactor = Math.log(threshold) / Math.log(length);
+        finalSize = Math.round(baseSize * scaleFactor);
+    }
+
+    const adjustedSize = Math.max(minSize, finalSize);
+    const adjustedStyle = { ...baseStyle, fontSize: adjustedSize };
+    
+    return getDynamicTextStyle(adjustedStyle);
+  };
 
 
   const subjectBlock = (
@@ -59,7 +79,7 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
           كراس القسم
         </h1>
         {showSubject && 
-          <p className="font-bold mt-2" style={getDynamicTextStyle(textStyles.subject)}>
+          <p className="font-bold mt-2 break-words" style={getAdjustedDynamicTextStyle(coverData.subject, textStyles.subject, 20)}>
             {coverData.subject}
           </p>
         }
@@ -71,8 +91,8 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
         <div className="text-center">
             <p className="text-xl font-semibold text-gray-200" style={fontStyle}>التلميذ/ة</p>
             <p 
-              className="font-extrabold tracking-wide" 
-              style={getDynamicTextStyle(textStyles.name)}
+              className="font-extrabold tracking-wide break-words" 
+              style={getAdjustedDynamicTextStyle(coverData.name, textStyles.name, 15)}
             >
               {coverData.name}
             </p>
@@ -94,20 +114,29 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
 
   const schoolNameBlock = (
     <div className="relative z-10 text-center bg-black/30 backdrop-blur-sm py-2 px-4 rounded-xl">
-        <p className="font-bold" style={getDynamicTextStyle(textStyles.schoolName)}>
+        <p className="font-bold break-words" style={getAdjustedDynamicTextStyle(coverData.schoolName, textStyles.schoolName, 25)}>
           {coverData.schoolName}
         </p>
     </div>
   );
   
+  const aspectRatio = paperSize === 'A4' ? 'aspect-[210/297]' : 'aspect-[17/22]';
+
   return (
     <div 
         id={id} 
-        className="bg-white rounded-xl shadow-2xl overflow-hidden aspect-[210/297] w-full max-w-2xl mx-auto border-4 border-gray-200"
+        className={`bg-white rounded-xl shadow-2xl overflow-hidden ${aspectRatio} w-full max-w-2xl mx-auto border-4 border-gray-200 transition-all duration-300 relative`}
     >
       <div
-        className="w-full h-full bg-cover bg-center relative p-8 md:p-12 flex flex-col justify-between"
-        style={{ backgroundImage: `url(${selectedTheme.imageUrl})` }}
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ 
+            backgroundImage: `url(${selectedTheme.imageUrl})`,
+            opacity: selectedTheme.opacity ?? 1,
+            mixBlendMode: selectedTheme.blendMode as any ?? 'normal',
+        }}
+      ></div>
+      <div
+        className="w-full h-full relative p-8 md:p-12 flex flex-col justify-center gap-8"
       >
         {subjectBlock}
 

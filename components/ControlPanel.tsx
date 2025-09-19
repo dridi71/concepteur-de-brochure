@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from '../types';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, PaperSize } from '../types';
 import { FONTS } from '../constants';
 import ThemeSelector from './ThemeSelector';
 import PrintButton from './PrintButton';
 import DownloadButton from './DownloadButton';
+import ExportPDFButton from './ExportPDFButton';
+import ExportWordButton from './ExportWordButton';
 import Modal from './Modal';
 import PrintPreviewModal from './PrintPreviewModal';
 import StyleControl from './StyleControl';
@@ -24,6 +26,8 @@ interface ControlPanelProps {
   setLayoutOrder: React.Dispatch<React.SetStateAction<LayoutOrder>>;
   textStyles: TextStyles;
   setTextStyles: React.Dispatch<React.SetStateAction<TextStyles>>;
+  paperSize: PaperSize;
+  setPaperSize: React.Dispatch<React.SetStateAction<PaperSize>>;
   onCustomImageUpload: (dataUrl: string) => void;
   onRemoveCustomTheme: () => void;
   onSaveDesign: () => void;
@@ -85,6 +89,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   setLayoutOrder,
   textStyles,
   setTextStyles,
+  paperSize,
+  setPaperSize,
   onCustomImageUpload,
   onRemoveCustomTheme,
   onSaveDesign,
@@ -108,7 +114,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
     if (!coverData.schoolYear.trim()) newErrors.schoolYear = "السنة الدراسية مطلوبة.";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    if (Object.keys(newErrors).length > 0) {
+      const fieldOrder: (keyof CoverData)[] = ['name', 'subject', 'className', 'schoolName', 'schoolYear'];
+      const firstErrorField = fieldOrder.find(field => newErrors[field]);
+      if (firstErrorField) {
+        const element = document.getElementById(firstErrorField);
+        element?.focus();
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return false;
+    }
+    
+    return true;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,6 +222,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
     <>
       <div className="bg-white p-6 rounded-xl shadow-lg space-y-6 sticky top-8">
         <h2 className="text-2xl font-bold text-gray-800 border-b pb-2">إعدادات الغلاف</h2>
+
+        {Object.keys(errors).length > 0 && (
+          <div className="p-4 bg-red-50 border border-red-300 rounded-lg animate-fade-in" role="alert">
+            <h3 className="text-md font-bold text-red-800">الرجاء إصلاح الأخطاء التالية:</h3>
+            <ul className="mt-2 list-disc list-inside text-sm text-red-700 space-y-1">
+              {Object.values(errors).map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         
         <div className="space-y-4">
           <InputField label="اسم التلميذ/ة" name="name" value={coverData.name} onChange={handleChange} error={errors.name} />
@@ -272,6 +301,23 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
 
         <div className="pt-4 mt-4 border-t border-gray-200">
+            <h3 className="text-lg font-medium text-gray-700 mb-3">حجم الطباعة</h3>
+            <fieldset>
+                <legend className="sr-only">اختر حجم الورق للطباعة</legend>
+                <div className="grid grid-cols-2 gap-2">
+                    <label htmlFor="size-a4" className={`cursor-pointer p-2 text-center rounded-lg border-2 transition-all ${paperSize === 'A4' ? 'bg-blue-100 border-blue-500 text-blue-800 font-bold' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
+                        <input id="size-a4" name="paper-size" type="radio" value="A4" checked={paperSize === 'A4'} onChange={() => setPaperSize('A4')} className="sr-only"/>
+                        <span>A4 (ورقة كبيرة)</span>
+                    </label>
+                    <label htmlFor="size-notebook" className={`cursor-pointer p-2 text-center rounded-lg border-2 transition-all ${paperSize === 'notebook' ? 'bg-blue-100 border-blue-500 text-blue-800 font-bold' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
+                        <input id="size-notebook" name="paper-size" type="radio" value="notebook" checked={paperSize === 'notebook'} onChange={() => setPaperSize('notebook')} className="sr-only"/>
+                        <span>كراس عادي (17x22)</span>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div className="pt-4 mt-4 border-t border-gray-200">
           <button
             onClick={() => setIsStylingOpen(!isStylingOpen)}
             className="w-full flex justify-between items-center text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors"
@@ -308,6 +354,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             </button>
           <div className="grid grid-cols-2 gap-3">
             <DownloadButton elementIdToCapture="printable-area" />
+            <ExportPDFButton elementIdToCapture="printable-area" paperSize={paperSize} />
+            <ExportWordButton elementIdToCapture="printable-area" paperSize={paperSize} />
             <PrintButton />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -360,6 +408,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         showSubject={showSubject}
         layoutOrder={layoutOrder}
         textStyles={textStyles}
+        paperSize={paperSize}
       />
       
       <Modal
@@ -391,6 +440,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                 showSubject={loadedDesignPreview.showSubject}
                 layoutOrder={loadedDesignPreview.layoutOrder}
                 textStyles={loadedDesignPreview.textStyles}
+                paperSize='A4'
               />
             </div>
             

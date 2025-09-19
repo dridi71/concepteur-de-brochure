@@ -9,6 +9,25 @@ interface ThemeSelectorProps {
   onRemoveCustomTheme: () => void;
 }
 
+const blendModes = [
+    { value: 'normal', label: 'عادي' },
+    { value: 'multiply', label: 'مضاعفة' },
+    { value: 'screen', label: 'شاشة' },
+    { value: 'overlay', label: 'تراكب' },
+    { value: 'darken', label: 'تعتيم' },
+    { value: 'lighten', label: 'تفتيح' },
+    { value: 'color-dodge', label: 'تهرب اللون' },
+    { value: 'color-burn', label: 'حرق اللون' },
+    { value: 'hard-light', label: 'ضوء قاسي' },
+    { value: 'soft-light', label: 'ضوء ناعم' },
+    { value: 'difference', label: 'فرق' },
+    { value: 'exclusion', label: 'استبعاد' },
+    { value: 'hue', label: 'صبغة' },
+    { value: 'saturation', label: 'تشبع' },
+    { value: 'color', label: 'لون' },
+    { value: 'luminosity', label: 'سطوع' },
+];
+
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes, selectedTheme, setSelectedTheme, onCustomImageUpload, onRemoveCustomTheme }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,6 +98,42 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ themes, selectedTheme, se
             </button>
           );
         })}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-gray-200 space-y-4">
+        <h3 className="text-lg font-medium text-gray-700">تخصيص الخلفية</h3>
+        <div>
+          <label htmlFor="bg-opacity" className="block text-sm font-medium text-gray-700 mb-1">
+            الشفافية: {Math.round((selectedTheme.opacity ?? 1) * 100)}%
+          </label>
+          <input
+            type="range"
+            id="bg-opacity"
+            min="0"
+            max="1"
+            step="0.05"
+            value={selectedTheme.opacity ?? 1}
+            onChange={(e) => setSelectedTheme(prev => ({ ...prev, opacity: parseFloat(e.target.value) }))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            aria-label="تغيير شفافية الخلفية"
+          />
+        </div>
+        <div>
+          <label htmlFor="bg-blend-mode" className="block text-sm font-medium text-gray-700 mb-1">
+            وضع الدمج
+          </label>
+          <select
+            id="bg-blend-mode"
+            value={selectedTheme.blendMode ?? 'normal'}
+            onChange={(e) => setSelectedTheme(prev => ({ ...prev, blendMode: e.target.value }))}
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            aria-label="تغيير وضع دمج الخلفية"
+          >
+            {blendModes.map(mode => (
+              <option key={mode.value} value={mode.value}>{mode.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {previewUrl && (

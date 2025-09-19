@@ -55,24 +55,27 @@ export const INITIAL_TEXT_STYLES: TextStyles = {
 
 
 export const THEMES: Theme[] = [
-  { id: 'space', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space123/840/1188' },
-  { id: 'animals', name: 'حيوانات', imageUrl: 'https://picsum.photos/seed/animals123/840/1188' },
-  { id: 'school', name: 'مدرسة', imageUrl: 'https://picsum.photos/seed/school123/840/1188' },
-  { id: 'nature', name: 'طبيعة', imageUrl: 'https://picsum.photos/seed/nature123/840/1188' },
-  { id: 'art', name: 'فن', imageUrl: 'https://picsum.photos/seed/art123/840/1188' },
-  { id: 'science', name: 'علوم', imageUrl: 'https://picsum.photos/seed/science123/840/1188' },
-  { id: 'sports', name: 'رياضة', imageUrl: 'https://picsum.photos/seed/sports123/840/1188' },
-  { id: 'tech', name: 'تكنولوجيا', imageUrl: 'https://picsum.photos/seed/tech123/840/1188' },
-  { id: 'history', name: 'تاريخ', imageUrl: 'https://picsum.photos/seed/history123/840/1188' },
-  { id: 'stitch', name: 'ستيتش', imageUrl: 'https://picsum.photos/seed/stitch123/840/1188' },
-  { id: 'mickey', name: 'ميكي ماوس', imageUrl: 'https://picsum.photos/seed/mickey123/840/1188' },
-  { id: 'space_2', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space456/840/1188' },
-  { id: 'animals_2', name: 'حيوانات', imageUrl: 'https://picsum.photos/seed/animals456/840/1188' },
-  { id: 'school_2', name: 'مدرسة', imageUrl: 'https://picsum.photos/seed/school456/840/1188' },
+  { id: 'space', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'animals', name: 'حيوانات', imageUrl: 'https://picsum.photos/seed/animals123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'school', name: 'مدرسة', imageUrl: 'https://picsum.photos/seed/school123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'nature', name: 'طبيعة', imageUrl: 'https://picsum.photos/seed/nature123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'art', name: 'فن', imageUrl: 'https://picsum.photos/seed/art123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'science', name: 'علوم', imageUrl: 'https://picsum.photos/seed/science123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'sports', name: 'رياضة', imageUrl: 'https://picsum.photos/seed/sports123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'tech', name: 'تكنولوجيا', imageUrl: 'https://picsum.photos/seed/tech123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'history', name: 'تاريخ', imageUrl: 'https://picsum.photos/seed/history123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'stitch', name: 'ستيتش', imageUrl: 'https://picsum.photos/seed/stitch123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'mickey', name: 'ميكي ماوس', imageUrl: 'https://picsum.photos/seed/mickey123/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'space_2', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space456/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'animals_2', name: 'حيوانات', imageUrl: 'https://picsum.photos/seed/animals456/840/1188', opacity: 1, blendMode: 'normal' },
+  { id: 'school_2', name: 'مدرسة', imageUrl: 'https://picsum.photos/seed/school456/840/1188', opacity: 1, blendMode: 'normal' },
 ];
 
 export const FONTS: { id: FontFamily; name: string }[] = [
   { id: 'Cairo', name: 'كايرو' },
   { id: 'Amiri', name: 'أميري' },
   { id: 'Lateef', name: 'لطيف' },
+  { id: 'Tajawal', name: 'تجوال' },
+  { id: 'Lalezar', name: 'لالزار' },
+  { id: 'Katibeh', name: 'كتيبة' },
 ];

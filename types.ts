@@ -10,6 +10,8 @@ export interface Theme {
   id: string;
   name: string;
   imageUrl: string;
+  opacity: number;
+  blendMode: string;
 }
 
 export interface TextStroke {
@@ -47,6 +49,8 @@ export interface TextStyles {
   otherInfo: TextStyle;
 }
 
-export type FontFamily = 'Cairo' | 'Amiri' | 'Lateef';
+export type FontFamily = 'Cairo' | 'Amiri' | 'Lateef' | 'Tajawal' | 'Lalezar' | 'Katibeh';
 
 export type LayoutOrder = 'default' | 'schoolNameFirst';
+
+export type PaperSize = 'A4' | 'notebook';

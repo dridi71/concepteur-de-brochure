@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from './types';
+import React, { useState, useEffect } from 'react';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles, PaperSize } from './types';
 import { INITIAL_COVER_DATA, THEMES, INITIAL_TEXT_STYLES } from './constants';
 import ControlPanel from './components/ControlPanel';
 import CoverPreview from './components/CoverPreview';
@@ -13,9 +13,20 @@ function App() {
   const [showSubject, setShowSubject] = useState<boolean>(true);
   const [layoutOrder, setLayoutOrder] = useState<LayoutOrder>('default');
   const [textStyles, setTextStyles] = useState<TextStyles>(INITIAL_TEXT_STYLES);
+  const [paperSize, setPaperSize] = useState<PaperSize>('A4');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-papersize', paperSize);
+  }, [paperSize]);
 
   const handleCustomImageUpload = (dataUrl: string) => {
-    const customTheme: Theme = { id: 'custom', name: 'مخصص', imageUrl: dataUrl };
+    const customTheme: Theme = { 
+        id: 'custom', 
+        name: 'مخصص', 
+        imageUrl: dataUrl,
+        opacity: 1,
+        blendMode: 'normal',
+    };
 
     setAvailableThemes(prevThemes => {
         const customThemeExists = prevThemes.some(theme => theme.id === 'custom');
@@ -83,12 +94,34 @@ function App() {
       setShowSubject(loadedShowSubject ?? true);
       setLayoutOrder(loadedLayoutOrder || 'default');
       setTextStyles(loadedTextStyles || INITIAL_TEXT_STYLES);
+      
+      // Add default opacity and blendMode if they are missing from saved data for backward compatibility
+      const themeWithDefaults: Theme = {
+        ...loadedTheme,
+        opacity: loadedTheme.opacity ?? 1,
+        blendMode: loadedTheme.blendMode ?? 'normal',
+      };
 
       if (loadedTheme.id === 'custom') {
-        handleCustomImageUpload(loadedTheme.imageUrl);
+        // Create the custom theme first
+        const customTheme: Theme = { 
+            id: 'custom', 
+            name: 'مخصص', 
+            imageUrl: loadedTheme.imageUrl,
+            opacity: themeWithDefaults.opacity,
+            blendMode: themeWithDefaults.blendMode,
+        };
+        setAvailableThemes(prevThemes => {
+            const customThemeExists = prevThemes.some(theme => theme.id === 'custom');
+            if (customThemeExists) {
+                return prevThemes.map(theme => theme.id === 'custom' ? customTheme : theme);
+            }
+            return [customTheme, ...prevThemes.filter(t => t.id !== 'custom')];
+        });
+        setSelectedTheme(customTheme);
       } else {
         const themeFromConstants = THEMES.find(t => t.id === loadedTheme.id);
-        setSelectedTheme(themeFromConstants || THEMES[0]);
+        setSelectedTheme(themeFromConstants ? { ...themeFromConstants, ...themeWithDefaults } : THEMES[0]);
       }
       
       alert('تم تحميل التصميم بنجاح!');
@@ -106,6 +139,7 @@ function App() {
     setLayoutOrder('default');
     setTextStyles(INITIAL_TEXT_STYLES);
     setAvailableThemes(THEMES);
+    setPaperSize('A4');
   };
 
   return (
@@ -136,6 +170,8 @@ function App() {
               setLayoutOrder={setLayoutOrder}
               textStyles={textStyles}
               setTextStyles={setTextStyles}
+              paperSize={paperSize}
+              setPaperSize={setPaperSize}
               onCustomImageUpload={handleCustomImageUpload}
               onRemoveCustomTheme={handleRemoveCustomTheme}
               onSaveDesign={handleSaveDesign}
@@ -151,6 +187,7 @@ function App() {
               showSubject={showSubject}
               layoutOrder={layoutOrder}
               textStyles={textStyles}
+              paperSize={paperSize}
             />
           </div>
         </div>
