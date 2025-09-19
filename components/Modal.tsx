@@ -6,9 +6,10 @@ interface ModalProps {
   onConfirm: () => void;
   title: string;
   children: React.ReactNode;
+  maxWidth?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm, title, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm, title, children, maxWidth = 'max-w-md' }) => {
   if (!isOpen) {
     return null;
   }
@@ -22,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm, title, childr
       aria-labelledby="modal-title"
     >
       <div
-        className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale"
+        className={`bg-white rounded-xl shadow-2xl p-6 ${maxWidth} w-full transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3 id="modal-title" className="text-2xl font-bold text-gray-800 mb-4">{title}</h3>

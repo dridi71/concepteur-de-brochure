@@ -7,6 +7,7 @@ import DownloadButton from './DownloadButton';
 import Modal from './Modal';
 import PrintPreviewModal from './PrintPreviewModal';
 import StyleControl from './StyleControl';
+import CoverPreview from './CoverPreview';
 
 interface ControlPanelProps {
   coverData: CoverData;
@@ -375,28 +376,47 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         onClose={handleCloseLoadModal}
         onConfirm={handleConfirmLoad}
         title="تأكيد التحميل"
+        maxWidth="max-w-xl"
       >
         {loadedDesignPreview ? (
-          <div>
-              <p className="mb-4">هل أنت متأكد أنك تريد تحميل هذا التصميم؟ سيتم فقدان التغييرات الحالية غير المحفوظة.</p>
-              <div className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50 max-h-64 overflow-y-auto text-sm">
-                  <p><strong>الاسم:</strong> {loadedDesignPreview.coverData.name}</p>
-                  <p><strong>المادة:</strong> {loadedDesignPreview.coverData.subject}</p>
-                  <p><strong>التصميم:</strong> {loadedDesignPreview.selectedTheme.name}</p>
-                  <p><strong>الخط:</strong> {loadedDesignPreview.selectedFont}</p>
-                  {loadedDesignPreview.textStyles && (
-                    <div className="mt-2 pt-2 border-t">
-                      <p><strong>مقاسات الخطوط:</strong></p>
-                      <ul className="list-disc list-inside text-xs">
-                          <li>العنوان: {loadedDesignPreview.textStyles.title.fontSize}px</li>
-                          <li>الاسم: {loadedDesignPreview.textStyles.name.fontSize}px</li>
-                          <li>المادة: {loadedDesignPreview.textStyles.subject.fontSize}px</li>
-                          <li>المدرسة: {loadedDesignPreview.textStyles.schoolName.fontSize}px</li>
-                          <li>أخرى: {loadedDesignPreview.textStyles.otherInfo.fontSize}px</li>
-                      </ul>
-                    </div>
-                  )}
+          <div className="space-y-4">
+            <p>هل أنت متأكد أنك تريد تحميل هذا التصميم؟ سيتم فقدان التغييرات الحالية غير المحفوظة.</p>
+            
+            <div className="w-full max-w-sm mx-auto border-4 border-gray-300 rounded-lg shadow-inner bg-gray-100 p-1">
+              <CoverPreview
+                id="load-preview-cover"
+                coverData={loadedDesignPreview.coverData}
+                selectedTheme={loadedDesignPreview.selectedTheme}
+                selectedFont={loadedDesignPreview.selectedFont}
+                showSubject={loadedDesignPreview.showSubject}
+                layoutOrder={loadedDesignPreview.layoutOrder}
+                textStyles={loadedDesignPreview.textStyles}
+              />
+            </div>
+            
+            <details className="text-sm bg-gray-50 rounded-lg p-2 border">
+              <summary className="cursor-pointer font-medium text-gray-700 hover:text-blue-600">
+                عرض التفاصيل النصية للتصميم المحفوظ
+              </summary>
+              <div className="mt-3 pt-3 border-t space-y-1">
+                <p><strong>الاسم:</strong> {loadedDesignPreview.coverData.name}</p>
+                <p><strong>المادة:</strong> {loadedDesignPreview.coverData.subject}</p>
+                <p><strong>التصميم:</strong> {loadedDesignPreview.selectedTheme.name}</p>
+                <p><strong>الخط:</strong> {loadedDesignPreview.selectedFont}</p>
+                {loadedDesignPreview.textStyles && (
+                  <div className="mt-2 pt-2 border-t">
+                    <p><strong>تفاصيل الأنماط:</strong></p>
+                    <ul className="list-disc list-inside text-xs">
+                      <li>العنوان: {loadedDesignPreview.textStyles.title.fontSize}px - {loadedDesignPreview.textStyles.title.color}</li>
+                      <li>الاسم: {loadedDesignPreview.textStyles.name.fontSize}px - {loadedDesignPreview.textStyles.name.color}</li>
+                      <li>المادة: {loadedDesignPreview.textStyles.subject.fontSize}px - {loadedDesignPreview.textStyles.subject.color}</li>
+                      <li>المدرسة: {loadedDesignPreview.textStyles.schoolName.fontSize}px - {loadedDesignPreview.textStyles.schoolName.color}</li>
+                      <li>أخرى: {loadedDesignPreview.textStyles.otherInfo.fontSize}px - {loadedDesignPreview.textStyles.otherInfo.color}</li>
+                    </ul>
+                  </div>
+                )}
               </div>
+            </details>
           </div>
         ) : (
           <p>جاري تحميل معاينة التصميم...</p>

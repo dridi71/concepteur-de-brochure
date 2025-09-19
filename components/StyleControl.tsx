@@ -1,5 +1,5 @@
 import React from 'react';
-import type { FontFamily, TextStyle, TextStroke, TextShadow } from '../types';
+import type { FontFamily, TextStyle, TextStroke, TextShadow, TextGradient } from '../types';
 
 interface StyleControlProps {
   label: string;
@@ -9,13 +9,21 @@ interface StyleControlProps {
   onStyleChange: (newStyle: TextStyle) => void;
 }
 
-const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, fontFamily, onStyleChange }) => {
-  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onStyleChange({ ...style, fontSize: Number(e.target.value) });
-  };
+const gradientDirections = [
+  { value: 'to right', label: 'يمين' },
+  { value: 'to left', label: 'يسار' },
+  { value: 'to bottom', label: 'أسفل' },
+  { value: 'to top', label: 'أعلى' },
+  { value: 'to bottom right', label: 'أسفل يمين' },
+  { value: 'to bottom left', label: 'أسفل يسار' },
+  { value: 'to top right', label: 'أعلى يمين' },
+  { value: 'to top left', label: 'أعلى يسار' },
+];
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onStyleChange({ ...style, color: e.target.value });
+const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, fontFamily, onStyleChange }) => {
+  
+  const handleStyleChange = (prop: keyof TextStyle, value: any) => {
+    onStyleChange({ ...style, [prop]: value });
   };
 
   const handleStrokeChange = (prop: keyof TextStroke, value: string | number) => {
@@ -38,8 +46,40 @@ const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, 
     });
   };
 
-  const textShadowValue = style.shadow ? `${style.shadow.offsetX}px ${style.shadow.offsetY}px ${style.shadow.blur}px ${style.shadow.color}` : 'none';
-  const textStrokeValue = style.stroke ? `${style.stroke.width}px ${style.stroke.color}` : 'none';
+  const handleGradientChange = (prop: keyof TextGradient, value: string | number | boolean) => {
+    onStyleChange({
+      ...style,
+      gradient: {
+        ...(style.gradient || { enabled: false, color1: '#FFFFFF', color2: '#000000', direction: 'to right' }),
+        [prop]: value,
+      },
+    });
+  };
+
+  const getPreviewStyle = (): React.CSSProperties => {
+    const previewStyle: React.CSSProperties = {
+      fontFamily: `'${fontFamily}', sans-serif`,
+      fontSize: `${style.fontSize}px`,
+      color: style.color,
+    };
+  
+    if (style.gradient?.enabled) {
+      previewStyle.background = `linear-gradient(${style.gradient.direction}, ${style.gradient.color1}, ${style.gradient.color2})`;
+      previewStyle.WebkitBackgroundClip = 'text';
+      previewStyle.backgroundClip = 'text';
+      previewStyle.color = 'transparent';
+    }
+  
+    if (style.stroke && style.stroke.width > 0) {
+      previewStyle.WebkitTextStroke = `${style.stroke.width}px ${style.stroke.color}`;
+    }
+  
+    if (style.shadow && (style.shadow.blur > 0 || style.shadow.offsetX !== 0 || style.shadow.offsetY !== 0)) {
+      previewStyle.textShadow = `${style.shadow.offsetX}px ${style.shadow.offsetY}px ${style.shadow.blur}px ${style.shadow.color}`;
+    }
+  
+    return previewStyle;
+  };
 
 
   return (
@@ -48,13 +88,7 @@ const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, 
       
       <div 
         className="w-full p-2 mb-3 bg-gray-700 text-white rounded text-center truncate" 
-        style={{ 
-          fontFamily: `'${fontFamily}', sans-serif`, 
-          fontSize: `${style.fontSize}px`, 
-          color: style.color,
-          WebkitTextStroke: textStrokeValue,
-          textShadow: textShadowValue
-        }}
+        style={getPreviewStyle()}
         aria-label={`معاينة لـ ${label}`}
       >
         {previewText || "نص للمعاينة"}
@@ -65,15 +99,56 @@ const StyleControl: React.FC<StyleControlProps> = ({ label, previewText, style, 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
           <div className="flex items-center gap-2">
             <label htmlFor={`size-${label}`} className="text-xs text-gray-600 flex-shrink-0">الحجم</label>
-            <input id={`size-${label}`} type="range" min="12" max="120" step="1" value={style.fontSize} onChange={handleSizeChange} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" aria-label={`تغيير حجم خط ${label}`} />
+            <input id={`size-${label}`} type="range" min="12" max="120" step="1" value={style.fontSize} onChange={(e) => handleStyleChange('fontSize', Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" aria-label={`تغيير حجم خط ${label}`} />
             <span className="text-sm font-mono bg-white border rounded px-1.5 py-0.5 w-10 text-center">{style.fontSize}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <label htmlFor={`color-${label}`} className="text-xs text-gray-600 flex-shrink-0">اللون</label>
-            <input id={`color-${label}`} type="color" value={style.color} onChange={handleColorChange} className="p-0 h-8 w-10 border-2 border-transparent rounded-md cursor-pointer" aria-label={`تغيير لون خط ${label}`} />
-          </div>
+          {!style.gradient?.enabled && (
+            <div className="flex items-center gap-2">
+              <label htmlFor={`color-${label}`} className="text-xs text-gray-600 flex-shrink-0">اللون</label>
+              <input id={`color-${label}`} type="color" value={style.color} onChange={(e) => handleStyleChange('color', e.target.value)} className="p-0 h-8 w-10 border-2 border-transparent rounded-md cursor-pointer" aria-label={`تغيير لون خط ${label}`} />
+            </div>
+          )}
         </div>
         
+        {/* Gradient Style */}
+        <div className="pt-3 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-700">التدرج اللوني (Gradient)</p>
+             <button
+                type="button"
+                onClick={() => handleGradientChange('enabled', !style.gradient?.enabled)}
+                className={`${style.gradient?.enabled ? 'bg-blue-600' : 'bg-gray-300'} relative inline-flex flex-shrink-0 h-5 w-9 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                role="switch"
+                aria-checked={style.gradient?.enabled}
+              >
+                <span className={`${style.gradient?.enabled ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}/>
+              </button>
+          </div>
+          {style.gradient?.enabled && (
+            <div className="mt-2 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor={`gradient-color1-${label}`} className="text-xs text-gray-600 flex-shrink-0">لون 1</label>
+                    <input id={`gradient-color1-${label}`} type="color" value={style.gradient?.color1 ?? '#FFFFFF'} onChange={(e) => handleGradientChange('color1', e.target.value)} className="p-0 h-8 w-10 border-2 border-transparent rounded-md cursor-pointer" />
+                  </div>
+                   <div className="flex items-center gap-2">
+                    <label htmlFor={`gradient-color2-${label}`} className="text-xs text-gray-600 flex-shrink-0">لون 2</label>
+                    <input id={`gradient-color2-${label}`} type="color" value={style.gradient?.color2 ?? '#000000'} onChange={(e) => handleGradientChange('color2', e.target.value)} className="p-0 h-8 w-10 border-2 border-transparent rounded-md cursor-pointer" />
+                  </div>
+              </div>
+              <div>
+                <label htmlFor={`gradient-dir-${label}`} className="text-xs text-gray-600 mb-1 block">الاتجاه</label>
+                <select id={`gradient-dir-${label}`} value={style.gradient?.direction ?? 'to right'} onChange={(e) => handleGradientChange('direction', e.target.value)} className="w-full p-1.5 border border-gray-300 rounded-md shadow-sm text-sm">
+                  {gradientDirections.map(dir => (
+                    <option key={dir.value} value={dir.value}>{dir.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+
+
         {/* Stroke Style */}
         <div className="pt-3 border-t border-gray-200">
            <p className="text-xs font-semibold text-gray-700 mb-2">الإطار الخارجي (Stroke)</p>

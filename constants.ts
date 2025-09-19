@@ -8,36 +8,48 @@ export const INITIAL_COVER_DATA: CoverData = {
   subject: "المادة",
 };
 
+const defaultGradient = {
+  enabled: false,
+  color1: '#FFFFFF',
+  color2: '#AFAFAF',
+  direction: 'to right',
+};
+
 export const INITIAL_TEXT_STYLES: TextStyles = {
   title: { 
     fontSize: 48, 
     color: '#2563EB',
     stroke: { color: '#FFFFFF', width: 1 },
     shadow: { color: 'rgba(0,0,0,0.3)', blur: 3, offsetX: 2, offsetY: 2 },
+    gradient: { enabled: false, color1: '#67E8F9', color2: '#2563EB', direction: 'to bottom right' },
   },
   name: { 
     fontSize: 36, 
     color: '#67E8F9',
     stroke: { color: '#000000', width: 0 },
     shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+    gradient: defaultGradient,
   },
   subject: { 
     fontSize: 24, 
     color: '#F3F4F6',
     stroke: { color: '#000000', width: 0 },
     shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+    gradient: defaultGradient,
   },
   schoolName: { 
     fontSize: 20, 
     color: '#FFFFFF',
     stroke: { color: '#000000', width: 0 },
     shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+    gradient: defaultGradient,
   },
   otherInfo: { 
     fontSize: 24, 
     color: '#FFFFFF',
     stroke: { color: '#000000', width: 0 },
     shadow: { color: 'rgba(0,0,0,0)', blur: 0, offsetX: 0, offsetY: 0 },
+    gradient: defaultGradient,
   },
 };
 

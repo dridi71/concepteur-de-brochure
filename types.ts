@@ -1,4 +1,3 @@
-
 export interface CoverData {
   name: string;
   className: string;
@@ -25,11 +24,19 @@ export interface TextShadow {
   offsetY: number; // in pixels
 }
 
+export interface TextGradient {
+  enabled: boolean;
+  color1: string;
+  color2: string;
+  direction: string;
+}
+
 export interface TextStyle {
   fontSize: number; // in pixels
   color: string;
   stroke?: TextStroke;
   shadow?: TextShadow;
+  gradient?: TextGradient;
 }
 
 export interface TextStyles {

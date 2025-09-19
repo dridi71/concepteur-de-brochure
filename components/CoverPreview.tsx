@@ -29,6 +29,13 @@ const CoverPreview: React.FC<CoverPreviewProps> = ({ coverData, selectedTheme, i
       color: style.color,
     };
 
+    if (style.gradient?.enabled) {
+      dynamicStyle.background = `linear-gradient(${style.gradient.direction}, ${style.gradient.color1}, ${style.gradient.color2})`;
+      dynamicStyle.WebkitBackgroundClip = 'text';
+      dynamicStyle.backgroundClip = 'text';
+      dynamicStyle.color = 'transparent';
+    }
+
     if (style.stroke && style.stroke.width > 0) {
       dynamicStyle.WebkitTextStroke = `${style.stroke.width}px ${style.stroke.color}`;
       // A more standard property, though less supported
