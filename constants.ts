@@ -1,4 +1,4 @@
-import type { CoverData, Theme, FontFamily } from './types';
+import type { CoverData, Theme, FontFamily, TextStyles } from './types';
 
 export const INITIAL_COVER_DATA: CoverData = {
   name: "اسم التلميذ/ة",
@@ -7,6 +7,15 @@ export const INITIAL_COVER_DATA: CoverData = {
   schoolName: "اسم المدرسة",
   subject: "المادة",
 };
+
+export const INITIAL_TEXT_STYLES: TextStyles = {
+  title: { fontSize: 48, color: '#2563EB' }, // Corresponds to text-blue-700
+  name: { fontSize: 36, color: '#67E8F9' }, // Corresponds to text-cyan-300
+  subject: { fontSize: 24, color: '#F3F4F6' }, // Corresponds to text-gray-100
+  schoolName: { fontSize: 20, color: '#FFFFFF' }, // Corresponds to text-white
+  otherInfo: { fontSize: 24, color: '#FFFFFF' }, // Corresponds to text-white
+};
+
 
 export const THEMES: Theme[] = [
   { id: 'space', name: 'فضاء', imageUrl: 'https://picsum.photos/seed/space123/840/1188' },

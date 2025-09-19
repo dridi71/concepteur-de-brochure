@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder } from '../types';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from '../types';
 import { FONTS } from '../constants';
 import ThemeSelector from './ThemeSelector';
 import PrintButton from './PrintButton';
 import DownloadButton from './DownloadButton';
 import Modal from './Modal';
 import PrintPreviewModal from './PrintPreviewModal';
+import StyleControl from './StyleControl';
 
 interface ControlPanelProps {
   coverData: CoverData;
@@ -20,6 +21,8 @@ interface ControlPanelProps {
   setShowSubject: React.Dispatch<React.SetStateAction<boolean>>;
   layoutOrder: LayoutOrder;
   setLayoutOrder: React.Dispatch<React.SetStateAction<LayoutOrder>>;
+  textStyles: TextStyles;
+  setTextStyles: React.Dispatch<React.SetStateAction<TextStyles>>;
   onCustomImageUpload: (dataUrl: string) => void;
   onRemoveCustomTheme: () => void;
   onSaveDesign: () => void;
@@ -33,6 +36,7 @@ interface LoadedDesignData {
   selectedFont: FontFamily;
   showSubject: boolean;
   layoutOrder: LayoutOrder;
+  textStyles: TextStyles;
 }
 
 const InputField: React.FC<{
@@ -78,6 +82,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   setShowSubject,
   layoutOrder,
   setLayoutOrder,
+  textStyles,
+  setTextStyles,
   onCustomImageUpload,
   onRemoveCustomTheme,
   onSaveDesign,
@@ -88,6 +94,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
+  const [isStylingOpen, setIsStylingOpen] = useState(false);
   const [loadedDesignPreview, setLoadedDesignPreview] = useState<LoadedDesignData | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof CoverData, string>>>({});
 
@@ -141,7 +148,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       }
 
       const savedDesign = JSON.parse(savedDesignJSON);
-      const { coverData: loadedCoverData, selectedTheme: savedThemeStub, selectedFont: loadedFont, showSubject: loadedShowSubject, layoutOrder: loadedLayoutOrder } = savedDesign;
+      const { coverData: loadedCoverData, selectedTheme: savedThemeStub, selectedFont: loadedFont, showSubject: loadedShowSubject, layoutOrder: loadedLayoutOrder, textStyles: loadedTextStyles } = savedDesign;
 
       if (!loadedCoverData || !savedThemeStub || !savedThemeStub.id) {
         throw new Error('Invalid design data in localStorage.');
@@ -166,6 +173,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           selectedFont: loadedFont || 'Cairo',
           showSubject: loadedShowSubject ?? true,
           layoutOrder: loadedLayoutOrder || 'default',
+          textStyles: loadedTextStyles,
       });
       setIsLoadModalOpen(true);
 
@@ -262,6 +270,29 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             </div>
         </div>
 
+        <div className="pt-4 mt-4 border-t border-gray-200">
+          <button
+            onClick={() => setIsStylingOpen(!isStylingOpen)}
+            className="w-full flex justify-between items-center text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            aria-expanded={isStylingOpen}
+          >
+            <span>تخصيص النصوص</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform ${isStylingOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {isStylingOpen && (
+            <div className="mt-4 space-y-4 animate-fade-in">
+              <StyleControl label="العنوان (كراس القسم)" previewText="كراس القسم" fontFamily={selectedFont} style={textStyles.title} onStyleChange={(newStyle) => setTextStyles(s => ({...s, title: newStyle}))} />
+              <StyleControl label="اسم التلميذ/ة" previewText={coverData.name} fontFamily={selectedFont} style={textStyles.name} onStyleChange={(newStyle) => setTextStyles(s => ({...s, name: newStyle}))} />
+              <StyleControl label="المادة" previewText={coverData.subject} fontFamily={selectedFont} style={textStyles.subject} onStyleChange={(newStyle) => setTextStyles(s => ({...s, subject: newStyle}))} />
+              <StyleControl label="اسم المدرسة" previewText={coverData.schoolName} fontFamily={selectedFont} style={textStyles.schoolName} onStyleChange={(newStyle) => setTextStyles(s => ({...s, schoolName: newStyle}))} />
+              <StyleControl label="معلومات أخرى" previewText={`${coverData.className} | ${coverData.schoolYear}`} fontFamily={selectedFont} style={textStyles.otherInfo} onStyleChange={(newStyle) => setTextStyles(s => ({...s, otherInfo: newStyle}))} />
+            </div>
+          )}
+        </div>
+
+
         <div className="space-y-3 pt-6 border-t border-gray-200">
           <h3 className="text-lg font-medium text-gray-700 text-center">الإجراءات</h3>
           <button
@@ -308,6 +339,15 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             <span>إعادة تعيين</span>
           </button>
         </div>
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+          }
+        `}</style>
       </div>
 
       <PrintPreviewModal
@@ -318,6 +358,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         selectedFont={selectedFont}
         showSubject={showSubject}
         layoutOrder={layoutOrder}
+        textStyles={textStyles}
       />
       
       <Modal
@@ -338,13 +379,23 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         {loadedDesignPreview ? (
           <div>
               <p className="mb-4">هل أنت متأكد أنك تريد تحميل هذا التصميم؟ سيتم فقدان التغييرات الحالية غير المحفوظة.</p>
-              <div className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50 max-h-64 overflow-y-auto">
+              <div className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50 max-h-64 overflow-y-auto text-sm">
                   <p><strong>الاسم:</strong> {loadedDesignPreview.coverData.name}</p>
                   <p><strong>المادة:</strong> {loadedDesignPreview.coverData.subject}</p>
                   <p><strong>التصميم:</strong> {loadedDesignPreview.selectedTheme.name}</p>
                   <p><strong>الخط:</strong> {loadedDesignPreview.selectedFont}</p>
-                  <p><strong>إظهار المادة:</strong> {loadedDesignPreview.showSubject ? 'نعم' : 'لا'}</p>
-                  <p><strong>الترتيب:</strong> {loadedDesignPreview.layoutOrder === 'default' ? 'افتراضي' : 'تبديل'}</p>
+                  {loadedDesignPreview.textStyles && (
+                    <div className="mt-2 pt-2 border-t">
+                      <p><strong>مقاسات الخطوط:</strong></p>
+                      <ul className="list-disc list-inside text-xs">
+                          <li>العنوان: {loadedDesignPreview.textStyles.title.fontSize}px</li>
+                          <li>الاسم: {loadedDesignPreview.textStyles.name.fontSize}px</li>
+                          <li>المادة: {loadedDesignPreview.textStyles.subject.fontSize}px</li>
+                          <li>المدرسة: {loadedDesignPreview.textStyles.schoolName.fontSize}px</li>
+                          <li>أخرى: {loadedDesignPreview.textStyles.otherInfo.fontSize}px</li>
+                      </ul>
+                    </div>
+                  )}
               </div>
           </div>
         ) : (

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder } from './types';
-import { INITIAL_COVER_DATA, THEMES } from './constants';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from './types';
+import { INITIAL_COVER_DATA, THEMES, INITIAL_TEXT_STYLES } from './constants';
 import ControlPanel from './components/ControlPanel';
 import CoverPreview from './components/CoverPreview';
 
@@ -12,6 +12,7 @@ function App() {
   const [selectedFont, setSelectedFont] = useState<FontFamily>('Cairo');
   const [showSubject, setShowSubject] = useState<boolean>(true);
   const [layoutOrder, setLayoutOrder] = useState<LayoutOrder>('default');
+  const [textStyles, setTextStyles] = useState<TextStyles>(INITIAL_TEXT_STYLES);
 
   const handleCustomImageUpload = (dataUrl: string) => {
     const customTheme: Theme = { id: 'custom', name: 'مخصص', imageUrl: dataUrl };
@@ -45,6 +46,7 @@ function App() {
         selectedFont,
         showSubject,
         layoutOrder,
+        textStyles,
       };
       localStorage.setItem('notebookCoverDesign', JSON.stringify(designToSave));
       alert('تم حفظ التصميم بنجاح!');
@@ -63,7 +65,14 @@ function App() {
       }
 
       const savedDesign = JSON.parse(savedDesignJSON);
-      const { coverData: loadedCoverData, selectedTheme: loadedTheme, selectedFont: loadedFont, showSubject: loadedShowSubject, layoutOrder: loadedLayoutOrder } = savedDesign;
+      const { 
+        coverData: loadedCoverData, 
+        selectedTheme: loadedTheme, 
+        selectedFont: loadedFont, 
+        showSubject: loadedShowSubject, 
+        layoutOrder: loadedLayoutOrder,
+        textStyles: loadedTextStyles
+      } = savedDesign;
 
       if (!loadedCoverData || !loadedTheme || !loadedTheme.id) {
         throw new Error('Invalid design data in localStorage.');
@@ -73,6 +82,7 @@ function App() {
       setSelectedFont(loadedFont || 'Cairo');
       setShowSubject(loadedShowSubject ?? true);
       setLayoutOrder(loadedLayoutOrder || 'default');
+      setTextStyles(loadedTextStyles || INITIAL_TEXT_STYLES);
 
       if (loadedTheme.id === 'custom') {
         handleCustomImageUpload(loadedTheme.imageUrl);
@@ -94,11 +104,12 @@ function App() {
     setSelectedFont('Cairo');
     setShowSubject(true);
     setLayoutOrder('default');
+    setTextStyles(INITIAL_TEXT_STYLES);
     setAvailableThemes(THEMES);
   };
 
   return (
-    <div className="bg-slate-100 min-h-screen">
+    <div className="bg-slate-100 min-h-screen flex flex-col">
       <header className="bg-white shadow-md print:hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-3xl font-bold text-center text-blue-600">مصمم غلاف الكراس</h1>
@@ -107,7 +118,7 @@ function App() {
           </p>
         </div>
       </header>
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 flex-grow">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 print:hidden">
             <ControlPanel
@@ -123,6 +134,8 @@ function App() {
               setShowSubject={setShowSubject}
               layoutOrder={layoutOrder}
               setLayoutOrder={setLayoutOrder}
+              textStyles={textStyles}
+              setTextStyles={setTextStyles}
               onCustomImageUpload={handleCustomImageUpload}
               onRemoveCustomTheme={handleRemoveCustomTheme}
               onSaveDesign={handleSaveDesign}
@@ -137,10 +150,14 @@ function App() {
               selectedFont={selectedFont}
               showSubject={showSubject}
               layoutOrder={layoutOrder}
+              textStyles={textStyles}
             />
           </div>
         </div>
       </main>
+      <footer className="text-center py-4 bg-slate-200 print:hidden">
+        <p className="text-sm text-gray-600">&copy; {new Date().getFullYear()} Licence au nom de Mohamed Dridi.</p>
+      </footer>
     </div>
   );
 }

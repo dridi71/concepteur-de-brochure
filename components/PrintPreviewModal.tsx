@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CoverData, Theme, FontFamily, LayoutOrder } from '../types';
+import type { CoverData, Theme, FontFamily, LayoutOrder, TextStyles } from '../types';
 import CoverPreview from './CoverPreview';
 import PrintButton from './PrintButton';
 import DownloadButton from './DownloadButton';
@@ -12,9 +12,10 @@ interface PrintPreviewModalProps {
   selectedFont: FontFamily;
   showSubject: boolean;
   layoutOrder: LayoutOrder;
+  textStyles: TextStyles;
 }
 
-const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, coverData, selectedTheme, selectedFont, showSubject, layoutOrder }) => {
+const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, coverData, selectedTheme, selectedFont, showSubject, layoutOrder, textStyles }) => {
   if (!isOpen) {
     return null;
   }
@@ -58,6 +59,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ isOpen, onClose, 
               selectedFont={selectedFont} 
               showSubject={showSubject}
               layoutOrder={layoutOrder}
+              textStyles={textStyles}
             />
           </div>
         </div>
